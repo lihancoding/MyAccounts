@@ -30,6 +30,8 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.fragment.app.FragmentActivity
+import com.lihan.myaccounts.loginui.LoginScreen
+import com.lihan.myaccounts.mainui.AccountListScreen
 import com.lihan.myaccounts.ui.theme.MyAccountsTheme
 import com.lihan.myaccounts.ui.theme.Shapes
 import java.util.concurrent.Executors
@@ -39,10 +41,7 @@ class MainActivity : FragmentActivity() {
         super.onCreate(savedInstanceState)
         AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_NO)
         setContent {
-            LoginScreen()
-//            fingerLogin(context)
-
-
+            Navigation()
         }
 
 
@@ -95,56 +94,4 @@ class MainActivity : FragmentActivity() {
     }
 }
 
-@Composable
-fun LoginScreen(){
-    val context = LocalContext.current
-    var pinCode  by remember{ mutableStateOf("") }
-    MyAccountsTheme {
-        Surface(
-                    modifier = Modifier.fillMaxSize(),
-                    color = Color.White
-                ){
 
-        Column (
-            modifier = Modifier.fillMaxWidth(),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-                ){
-            Text(
-                modifier = Modifier.padding(32.dp),
-                text = "PIN Code",
-                fontSize = 44.sp
-                )
-
-            OutlinedTextField(
-                colors = TextFieldDefaults.textFieldColors(
-                    backgroundColor = MaterialTheme.colors.primary,
-                    cursorColor = MaterialTheme.colors.primary,
-                    disabledLabelColor = Color.Black,
-                    focusedIndicatorColor = MaterialTheme.colors.primary,
-                    unfocusedIndicatorColor = MaterialTheme.colors.primary
-                ),
-                maxLines = 1,
-                singleLine = true,
-                shape = RoundedCornerShape(4.dp),
-                value = pinCode,
-                onValueChange = {
-                    pinCode = it
-                },
-                visualTransformation = PasswordVisualTransformation(),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
-
-            )
-            Button(
-                modifier = Modifier.padding(16.dp),
-                onClick = {
-                    if (pinCode.isNotEmpty()){
-                        Toast.makeText(context,"Pin code is $pinCode",Toast.LENGTH_SHORT).show()
-                    }
-                }) {
-                Text(text = "Login")
-            }
-            }
-        }
-    }
-}
