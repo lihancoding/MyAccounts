@@ -1,7 +1,6 @@
 package com.lihan.myaccounts.mainui
 
-import android.widget.ImageButton
-import android.widget.Toast
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -16,82 +15,43 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.colorspace.ColorSpace
-import androidx.compose.ui.graphics.compositeOver
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import com.lihan.myaccounts.Account
-import com.lihan.myaccounts.AccountType
-import com.lihan.myaccounts.ui.theme.*
+import com.lihan.myaccounts.data.Account
+import com.lihan.myaccounts.data.AccountType
 import com.wajahatkarim.flippable.Flippable
 import com.wajahatkarim.flippable.rememberFlipController
 import com.lihan.myaccounts.R
+import com.lihan.myaccounts.Resource
 import com.lihan.myaccounts.Screen
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @Composable
-fun AccountListScreen(navController: NavHostController) {
-    val dummyDataList = arrayListOf<Account>(
-        Account(
-            description = "",
-            password = "",
-            account = "",
-            icon = R.drawable.ic_baseline_bank_24,
-            type = AccountType.Bank
-        ),
-        Account(
-            description = "",
-            password = "",
-            account = "",
-            icon = R.drawable.ic_baseline_credit_card_24,
-            type = AccountType.CreditCard),
-       Account(
-                description = "",
-                password = "",
-                account = "",
-                icon = R.drawable.ic_baseline_credit_card_24,
-                type = AccountType.CreditCard),
-        Account(
-                    description = "",
-                    password = "",
-                    account = "",
-                    icon = R.drawable.ic_baseline_email_24,
-                    type = AccountType.Mail),
-        Account(
-                    description = "",
-                    password = "",
-                    account = "",
-                    icon = R.drawable.ic_baseline_game_24,
-                    type = AccountType.Game),
-        Account(
-                    description = "",
-                    password = "",
-                    account = "",
-                    icon = R.drawable.ic_baseline_phone_android_24,
-                    type = AccountType.Phone),
-        Account(
-                    description = "",
-                    password = "",
-                    account = "",
-                    icon = R.drawable.ic_baseline_web_24,
-                    type = AccountType.Web)
+fun AccountListScreen(
+    navController: NavHostController,
+    viewModel: AccountViewModel = hiltViewModel()
+) {
 
-
-    )
-
+    val scope = rememberCoroutineScope()
+    var data = remember {
+        mutableListOf<Account>()
+    }
     Scaffold(
         modifier = Modifier
             .background(Color.White)
             .fillMaxSize(),
         floatingActionButton = {
             FloatingActionButton(
+                modifier = Modifier.padding(16.dp),
                 onClick = {
                     navController.navigate(Screen.AccountInsertScreen.route)
                 }) {
@@ -99,15 +59,30 @@ fun AccountListScreen(navController: NavHostController) {
             }
         }
     ) {
+
         Column(
             Modifier.fillMaxSize()
         ) {
             LazyColumn{
-                items(dummyDataList){ it->
-                    AccountItem(account = it)
+                scope.launch {
+                    viewModel.accounts.collect {
+                        when(it){
+                            is Resource.Loading->{}
+                            is Resource.Success->{
+                                Log.d("TAG", "AccountListScreen: ")
+                               data.addAll(it.data)
+                            }
+                            is Resource.Fail->{
+                                Log.d("TAG", "AccountListScreen:  Fail")
+                                data.addAll(it.data)
+
+                            }
+                        }
+                    }
                 }
-                items(dummyDataList){ it->
-                    AccountItem(account = it)
+
+                items(data){ account->
+                    AccountItem(account = account)
                 }
             }
 
