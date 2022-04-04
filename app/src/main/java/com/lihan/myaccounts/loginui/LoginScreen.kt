@@ -1,11 +1,10 @@
 package com.lihan.myaccounts.loginui
 
+import android.content.Context
 import android.util.Log
 import androidx.biometric.BiometricManager
 import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.layout.*
-import androidx.compose.foundation.text.BasicTextField
-import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.runtime.*
@@ -14,9 +13,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import com.lihan.myaccounts.MainActivity
+import com.lihan.myaccounts.PINCODE_KEY
+import com.lihan.myaccounts.SHAREDPREFERENCES_KEY
 import com.lihan.myaccounts.Screen
 import java.util.concurrent.Executors
 
@@ -25,56 +25,93 @@ fun LoginScreen(navController: NavHostController, mainActivity: MainActivity) {
     val context = LocalContext.current
     var pinCode by remember { mutableStateOf("") }
     val openDialog = remember { mutableStateOf(true) }
+    val withFingerLogin = BiometricManager.from(mainActivity)
+        .canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS
 
-    pinCodeLogin()
-
-
-
-//    if (openDialog.value) {
-//        AlertDialog(
-//            onDismissRequest = {
-//                openDialog.value = false
-//            },
-//            title = {
-//                Text(text = "Login")
-//            },
-//            dismissButton = {
-//                val withFingerLogin = BiometricManager.from(mainActivity)
-//                    .canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS
-//                TextButton(onClick = {
-//                    if (withFingerLogin) {
-//                        fingerLogin(mainActivity,navController)
-//                        openDialog.value = false
-//                    }
-//                }, enabled = withFingerLogin) {
-//                    Text(text = "FingerLogin")
-//                }
-//            },
-//            text = {
-//                Text(text = "Choice your login way")
-//            },
-//            confirmButton = {
-//                TextButton(onClick = {
-//                    openDialog.value = false
-//                }) {
-//                    Text(text = "PinCode")
-//                }
-//
-//            }
-//        )
-//    }
-
-//    if (isHavePinCode()) {
-//
-//    } else {
-//
-//    }
+    if (!withFingerLogin){
+        val sp = mainActivity.getSharedPreferences(SHAREDPREFERENCES_KEY, Context.MODE_PRIVATE)
+        val mPinCode = sp.getString(PINCODE_KEY,"")
+        mPinCode?.let {
+            if (it.isEmpty()){
+                CreatePinCode(navController)
+            }else{
+                pinCodeLogin(navController)
+            }
+        }
+    }else{
+        fingerLogin(mainActivity,navController)
+    }
 
 
 }
 
 @Composable
-fun pinCodeLogin() {
+fun CreatePinCode(navController: NavHostController) {
+    val context = LocalContext.current
+    var textFieldValue by remember {
+        mutableStateOf("")
+    }
+    var textFieldValueAgain by remember {
+        mutableStateOf("")
+    }
+    Column(
+        modifier = Modifier.fillMaxSize(),
+        verticalArrangement = Arrangement.Center,
+        horizontalAlignment = Alignment.CenterHorizontally
+
+    ) {
+        Column {
+            OutlinedTextField(
+                label = { Text(text = "Create PinCode")},
+                value = textFieldValue,
+                onValueChange = {
+                    if (it.length <= 4){
+                        textFieldValue = it
+                    }
+                },
+                modifier = Modifier.padding(16.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                maxLines = 1,
+                singleLine = true
+
+            )
+            OutlinedTextField(
+                label = { Text(text = "Input again")},
+                value = textFieldValueAgain,
+                onValueChange = {
+                    if (it.length <= 4){
+                        textFieldValueAgain = it
+                    }
+                },
+                modifier = Modifier.padding(16.dp),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
+                maxLines = 1,
+                singleLine = true
+
+            )
+            Button(
+                onClick = {
+                    if (textFieldValue == textFieldValueAgain){
+                        val sp = context.getSharedPreferences(SHAREDPREFERENCES_KEY, Context.MODE_PRIVATE)
+                        sp.edit().putString(PINCODE_KEY,textFieldValue).commit()
+                        navController.navigate(Screen.AccountScreen.route)
+                    }
+                },
+                modifier = Modifier
+                    .align(Alignment.End)
+                    .padding(end = 16.dp)
+            ) {
+                Text(text = "Create")
+            }
+        }
+
+
+    }
+}
+
+@Composable
+fun pinCodeLogin(navController: NavHostController) {
+    val context = LocalContext.current
 
     var textFieldValue by remember {
         mutableStateOf("")
@@ -85,9 +122,6 @@ fun pinCodeLogin() {
     horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
-
-//        Text(text = "Login", fontSize = 30.sp, modifier = Modifier.padding(16.dp))
-
         Column {
             OutlinedTextField(
                 label = { Text(text = "PinCode")},
@@ -98,13 +132,19 @@ fun pinCodeLogin() {
                     }
                 },
                 modifier = Modifier.padding(16.dp),
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                 maxLines = 1,
                 singleLine = true
 
             )
             Button(
-                onClick = {},
+                onClick = {
+                    val sp = context.getSharedPreferences(SHAREDPREFERENCES_KEY,Context.MODE_PRIVATE)
+                    val pincode = sp.getString(PINCODE_KEY,"")
+                    if (pincode == textFieldValue){
+                        navController.navigate(Screen.AccountScreen.route)
+                    }
+                },
                 modifier = Modifier
                     .align(Alignment.End)
                     .padding(end = 16.dp)
