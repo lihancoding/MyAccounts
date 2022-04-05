@@ -41,10 +41,22 @@ fun AccountListScreen(
     viewModel: AccountViewModel = hiltViewModel()
 ) {
 
-    val scope = rememberCoroutineScope()
-    var data = remember {
+    val data = remember {
         mutableListOf<Account>()
     }
+    LaunchedEffect("",block = {
+        viewModel.accounts.collect {
+            when(it){
+                is Resource.Loading->{}
+                is Resource.Success->{
+                    data.addAll(it.data)
+                }
+                is Resource.Fail->{}
+            }
+        }
+    })
+
+
     Scaffold(
         modifier = Modifier
             .background(Color.White)
@@ -64,23 +76,6 @@ fun AccountListScreen(
             Modifier.fillMaxSize()
         ) {
             LazyColumn{
-                scope.launch {
-                    viewModel.accounts.collect {
-                        when(it){
-                            is Resource.Loading->{}
-                            is Resource.Success->{
-                                Log.d("TAG", "AccountListScreen: ")
-                               data.addAll(it.data)
-                            }
-                            is Resource.Fail->{
-                                Log.d("TAG", "AccountListScreen:  Fail")
-                                data.addAll(it.data)
-
-                            }
-                        }
-                    }
-                }
-
                 items(data){ account->
                     AccountItem(account = account)
                 }
@@ -93,14 +88,6 @@ fun AccountListScreen(
 }
 @Composable
 fun AccountItem(account : Account){
-//        val colorBackground = when(account.type){
-//            AccountType.Mail->{ Mail_Color}
-//            AccountType.Bank->{ Bank_Color}
-//            AccountType.CreditCard->{ CreditCard_Color}
-//            AccountType.Game->{ Game_Color}
-//            AccountType.Phone->{ Phone_Color}
-//            AccountType.Web->{ Web_Color}
-//        }
 
         Column(
             modifier = Modifier
@@ -132,7 +119,7 @@ fun AccountItem(account : Account){
                             )
                             Spacer(modifier = Modifier.width(8.dp))
                             Text(
-                                text = "${account.account}@#$@#$#@#$$$$%REFERFERFEF",
+                                text = "${account.account}",
                                 fontSize = 18.sp,
                                 maxLines = 1,
                                 fontFamily = FontFamily.Monospace
@@ -140,12 +127,14 @@ fun AccountItem(account : Account){
 
                         }
                     },
+
                     backSide = {
+
                         val space = rememberCoroutineScope()
                         var textValue by remember {
                             mutableStateOf("***********************")
                         }
-                        var passwrod = account.password
+                        val passwrod = account.password
                         Row(
                             Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
@@ -167,19 +156,21 @@ fun AccountItem(account : Account){
                                     .padding(10.dp)
                                     .size(55.dp)
                                     .weight(2f)
-                                    .clickable {
+                                    .clickable(onClick = {
                                         space.launch {
                                             val temp = textValue
                                             textValue = passwrod
-                                            delay(800)
+                                            delay(500)
                                             textValue = temp
                                         }
-                                    },
+                                    }),
                                 painter = painterResource(id = R.drawable.ic_baseline_watch_24),
                                 contentDescription = "watch",
                                 contentScale = ContentScale.Inside
                             )
                         }
+                    }, onFlippedListener = {
+
                     },
                     flipController = rememberFlipController()
                 )

@@ -36,13 +36,19 @@ class AccountViewModel @Inject constructor(
                         Account(0, R.drawable.ic_baseline_web_24,"enk23r","123345","web","webside")
                     ),"No Data")
                 }else{
-                    _accounts.value = Resource.Success(arrayListOf(
-                        Account(0, R.drawable.ic_baseline_web_24,"enk23r","123345","web","webside")
-                    ))
+                    _accounts.value = Resource.Success(it)
                 }
             }
         }
     }
+
+    fun insertAccount(account : Account){
+        viewModelScope.launch {
+            accountRepository.insert(account)
+        }
+    }
+
+
 
 
 }
