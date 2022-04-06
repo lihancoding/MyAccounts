@@ -6,6 +6,7 @@ import com.lihan.myaccounts.R
 import com.lihan.myaccounts.Resource
 import com.lihan.myaccounts.data.Account
 import com.lihan.myaccounts.data.AccountRepository
+import com.lihan.myaccounts.data.AccountRepositoryImp
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
@@ -27,7 +28,6 @@ class AccountViewModel @Inject constructor(
     }
 
     private fun getData() {
-
         _accounts.value = Resource.Loading
         viewModelScope.launch {
             accountRepository.getAllAccount().collectLatest {
@@ -52,6 +52,7 @@ class AccountViewModel @Inject constructor(
         viewModelScope.launch {
             accountRepository.delete(account)
         }
+
     }
 
 

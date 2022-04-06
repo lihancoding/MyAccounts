@@ -96,6 +96,9 @@ fun AccountItem(
     account : Account,
     viewModel: AccountViewModel = hiltViewModel())
 {
+    val showDeleteAlert = remember {
+        mutableStateOf(false)
+    }
 
         Column(
             modifier = Modifier
@@ -168,16 +171,38 @@ fun AccountItem(
                                     .padding(start = 24.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
+
                             Icon(
                                 modifier = Modifier
                                     .weight(1f)
                                     .clickable {
-                                        space.launch {
-                                            viewModel.deleteAccount(account)
-                                        }
+                                        showDeleteAlert.value = true
                                     },
                                 imageVector = Icons.Filled.Delete, contentDescription = "Delete"
                             )
+
+                            if (showDeleteAlert.value){
+                                AlertDialog(
+                                    title = { Text(text = "Delete")},
+                                    text = { Text(text = "You want delete this account ? ")},
+                                    onDismissRequest = {
+                                         showDeleteAlert.value = false
+                                    },
+                                    confirmButton = {
+                                        TextButton(onClick = {
+                                            viewModel.deleteAccount(account)
+                                            showDeleteAlert.value = false
+                                        }){
+                                            Text(text = "Ok")
+                                        }
+                                                    },
+                                    dismissButton = {
+                                            Text(text = "Cancel")
+                                    }
+                                    )
+                            }
+
+
                             Icon(
                                 modifier = Modifier
                                     .weight(1f)
@@ -202,6 +227,7 @@ fun AccountItem(
 
 
 }
+
 
 
 
