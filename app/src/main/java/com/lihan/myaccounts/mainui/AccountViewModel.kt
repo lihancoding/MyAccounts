@@ -48,6 +48,16 @@ class AccountViewModel @Inject constructor(
         }
     }
 
+    fun deleteAccount(account: Account){
+        viewModelScope.launch {
+            accountRepository.delete(account)
+        }
+    }
+
+
+
+
+
 
 
 

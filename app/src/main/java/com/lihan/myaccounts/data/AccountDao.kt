@@ -15,6 +15,6 @@ interface AccountDao {
     @Delete
     suspend fun delete(accountEntity: AccountEntity)
 
-    @Query("select * from AccountEntity")
+    @Query("select * from AccountEntity ORDER by type")
     fun getAllAccount() : Flow<List<AccountEntity>>
 }

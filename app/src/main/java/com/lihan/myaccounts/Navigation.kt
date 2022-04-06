@@ -23,7 +23,7 @@ fun Navigation(mainActivity: MainActivity) {
             AccountListScreen(navController)
         }
         composable(route = Screen.AccountInsertScreen.route){
-            AccountInsertScreen()
+            AccountInsertScreen(navController)
         }
     }
     

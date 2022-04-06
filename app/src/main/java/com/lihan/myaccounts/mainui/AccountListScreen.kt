@@ -11,6 +11,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Delete
+import androidx.compose.material.icons.filled.Edit
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -34,22 +36,25 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import java.util.*
+import kotlin.collections.ArrayList
 
 @Composable
 fun AccountListScreen(
     navController: NavHostController,
     viewModel: AccountViewModel = hiltViewModel()
 ) {
-
-    val data = remember {
-        mutableListOf<Account>()
+    var data by remember {
+        mutableStateOf(listOf<Account>())
     }
+
+
     LaunchedEffect("",block = {
         viewModel.accounts.collect {
             when(it){
                 is Resource.Loading->{}
                 is Resource.Success->{
-                    data.addAll(it.data)
+                    data = it.data
                 }
                 is Resource.Fail->{}
             }
@@ -87,7 +92,10 @@ fun AccountListScreen(
 
 }
 @Composable
-fun AccountItem(account : Account){
+fun AccountItem(
+    account : Account,
+    viewModel: AccountViewModel = hiltViewModel())
+{
 
         Column(
             modifier = Modifier
@@ -102,10 +110,11 @@ fun AccountItem(account : Account){
                 elevation = 4.dp
 
             ) {
+
                 Flippable(
                     frontSide = {
                         Row(
-                            Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxSize(),
                             verticalAlignment = Alignment.CenterVertically
 
                         ) {
@@ -118,31 +127,39 @@ fun AccountItem(account : Account){
                                 contentScale = ContentScale.Inside
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Text(
-                                text = "${account.account}",
-                                fontSize = 18.sp,
-                                maxLines = 1,
-                                fontFamily = FontFamily.Monospace
-                            )
+                            Column(
+                                Modifier.fillMaxWidth()
+                            ) {
+                                Text(
+                                    text = "${account.account}",
+                                    fontSize = 18.sp,
+                                    maxLines = 1,
+                                    fontFamily = FontFamily.Monospace
+                                )
+                                Text(
+                                    text = "${account.description}",
+                                    fontSize = 12.sp,
+                                    maxLines = 1,
+                                    fontFamily = FontFamily.Monospace
+                                )
+                            }
+
+
 
                         }
                     },
 
                     backSide = {
-
                         val space = rememberCoroutineScope()
-                        var textValue by remember {
-                            mutableStateOf("***********************")
-                        }
                         val passwrod = account.password
                         Row(
-                            Modifier.fillMaxWidth(),
+                            modifier = Modifier.fillMaxWidth(),
                             verticalAlignment = Alignment.CenterVertically,
                             horizontalArrangement = Arrangement.Center
                         ){
 
                             Text(
-                                text = textValue,
+                                text = passwrod,
                                 fontSize = 18.sp,
                                 maxLines = 1,
                                 fontFamily = FontFamily.Monospace,
@@ -151,28 +168,32 @@ fun AccountItem(account : Account){
                                     .padding(start = 24.dp)
                             )
                             Spacer(modifier = Modifier.width(8.dp))
-                            Image(
+                            Icon(
                                 modifier = Modifier
-                                    .padding(10.dp)
-                                    .size(55.dp)
-                                    .weight(2f)
-                                    .clickable(onClick = {
+                                    .weight(1f)
+                                    .clickable {
                                         space.launch {
-                                            val temp = textValue
-                                            textValue = passwrod
-                                            delay(500)
-                                            textValue = temp
+                                            viewModel.deleteAccount(account)
                                         }
-                                    }),
-                                painter = painterResource(id = R.drawable.ic_baseline_watch_24),
-                                contentDescription = "watch",
-                                contentScale = ContentScale.Inside
+                                    },
+                                imageVector = Icons.Filled.Delete, contentDescription = "Delete"
                             )
+                            Icon(
+                                modifier = Modifier
+                                    .weight(1f)
+                                    .clickable {
+
+                                    },
+                                imageVector = Icons.Filled.Edit, contentDescription = "Edit")
                         }
-                    }, onFlippedListener = {
+                    },
+
+                    onFlippedListener = {
 
                     },
-                    flipController = rememberFlipController()
+                    flipController = rememberFlipController(),
+                    autoFlip = true,
+                    autoFlipDurationMs = 1000
                 )
             }
 

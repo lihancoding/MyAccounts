@@ -31,6 +31,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AccountInsertScreen(
+    navController: NavController,
     viewModel: AccountViewModel = hiltViewModel()
 ) {
 
@@ -73,6 +74,7 @@ fun AccountInsertScreen(
                                 type = accountIcon.toString()
                             )
                         )
+                        navController.popBackStack()
                     }
                 }) {
                 Icon(Icons.Filled.Done,"")
@@ -124,9 +126,7 @@ fun AccountInsertScreen(
                 label = { Text(text = "Password")},
                 value = textPassword,
                 onValueChange ={
-                    if (textPassword.length <4){
                         textPassword = it
-                    }
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
                 )
