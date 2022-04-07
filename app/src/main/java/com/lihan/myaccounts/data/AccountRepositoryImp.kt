@@ -1,5 +1,6 @@
 package com.lihan.myaccounts.data
 
+import android.util.Log
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 
@@ -10,8 +11,9 @@ class AccountRepositoryImp (
         dao.insert(accountEntity = account.toAccountEntity())
     }
 
-    override suspend fun delete(account: Account) {
-        dao.delete(accountEntity = account.toAccountEntity())
+    override suspend fun delete(account: Account){
+        Log.d("TAG", "delete:  lmp ")
+        dao.delete(account.toAccountEntity())
     }
 
     override fun getAllAccount(): Flow<List<Account>> {

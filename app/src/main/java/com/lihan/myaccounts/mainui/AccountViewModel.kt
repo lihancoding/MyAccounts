@@ -1,5 +1,6 @@
 package com.lihan.myaccounts.mainui
 
+import android.util.Log
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lihan.myaccounts.R
@@ -21,7 +22,6 @@ class AccountViewModel @Inject constructor(
 
     private val _accounts = MutableStateFlow<Resource>(Resource.Loading)
     val accounts = _accounts
-
 
     init {
         getData()
@@ -49,10 +49,11 @@ class AccountViewModel @Inject constructor(
     }
 
     fun deleteAccount(account: Account){
+        Log.d("TAG", "deleteAccount: $account ")
         viewModelScope.launch {
             accountRepository.delete(account)
+            getData()
         }
-
     }
 
 

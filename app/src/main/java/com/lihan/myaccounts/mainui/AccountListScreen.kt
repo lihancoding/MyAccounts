@@ -48,13 +48,13 @@ fun AccountListScreen(
         mutableStateOf(listOf<Account>())
     }
 
-
     LaunchedEffect("",block = {
         viewModel.accounts.collect {
             when(it){
                 is Resource.Loading->{}
                 is Resource.Success->{
                     data = it.data
+                    Log.d("TAG", "AccountListScreen: ${it.data}")
                 }
                 is Resource.Fail->{}
             }
@@ -99,6 +99,7 @@ fun AccountItem(
     val showDeleteAlert = remember {
         mutableStateOf(false)
     }
+
 
         Column(
             modifier = Modifier
@@ -190,7 +191,7 @@ fun AccountItem(
                                     },
                                     confirmButton = {
                                         TextButton(onClick = {
-                                            viewModel.deleteAccount(account)
+                                            viewModel.deleteAccount(account = account)
                                             showDeleteAlert.value = false
                                         }){
                                             Text(text = "Ok")
@@ -216,9 +217,7 @@ fun AccountItem(
                     onFlippedListener = {
 
                     },
-                    flipController = rememberFlipController(),
-                    autoFlip = true,
-                    autoFlipDurationMs = 1000
+                    flipController = rememberFlipController()
                 )
             }
 
