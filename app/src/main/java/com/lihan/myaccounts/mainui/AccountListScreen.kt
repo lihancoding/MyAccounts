@@ -27,6 +27,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
+import androidx.navigation.navArgument
 import com.lihan.myaccounts.data.Account
 import com.lihan.myaccounts.data.AccountType
 import com.wajahatkarim.flippable.Flippable
@@ -82,7 +83,9 @@ fun AccountListScreen(
         ) {
             LazyColumn{
                 items(data){ account->
-                    AccountItem(account = account)
+                    AccountItem(account = account, toUpdate = {
+                        navController.navigate("${Screen.AccountUpdateScreen.route}/${account}")
+                    })
                 }
             }
 
@@ -94,6 +97,7 @@ fun AccountListScreen(
 @Composable
 fun AccountItem(
     account : Account,
+    toUpdate:() ->Unit ,
     viewModel: AccountViewModel = hiltViewModel())
 {
     val showDeleteAlert = remember {
@@ -154,7 +158,6 @@ fun AccountItem(
                     },
 
                     backSide = {
-                        val space = rememberCoroutineScope()
                         val passwrod = account.password
                         Row(
                             modifier = Modifier.fillMaxWidth(),
@@ -210,7 +213,7 @@ fun AccountItem(
                                 modifier = Modifier
                                     .weight(1f)
                                     .clickable {
-
+                                        toUpdate()
                                     },
                                 imageVector = Icons.Filled.Edit, contentDescription = "Edit")
                         }
