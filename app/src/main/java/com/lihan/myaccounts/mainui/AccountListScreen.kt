@@ -1,6 +1,7 @@
 package com.lihan.myaccounts.mainui
 
 import android.util.Log
+import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,6 +19,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -44,6 +46,7 @@ fun AccountListScreen(
     navController: NavHostController,
     viewModel: AccountViewModel = hiltViewModel()
 ) {
+    val context = LocalContext.current
     var data by remember {
         mutableStateOf(listOf<Account>())
     }
@@ -52,11 +55,8 @@ fun AccountListScreen(
         viewModel.accounts.collect {
             when(it){
                 is Resource.Loading->{}
-                is Resource.Success->{
-                    data = it.data
-                    Log.d("TAG", "AccountListScreen: ${it.data}")
-                }
-                is Resource.Fail->{}
+                is Resource.Success->{ data = it.data }
+                is Resource.Fail->{ data = it.data }
             }
         }
     })
@@ -72,7 +72,7 @@ fun AccountListScreen(
                 onClick = {
                     navController.navigate(Screen.AccountInsertScreen.route)
                 }) {
-                Icon(Icons.Filled.Add,"")
+                Icon(Icons.Filled.Add,"", tint = Color.White)
             }
         }
     ) {
@@ -198,7 +198,9 @@ fun AccountItem(
                                         }
                                                     },
                                     dismissButton = {
+                                        TextButton(onClick = { showDeleteAlert.value = false }){
                                             Text(text = "Cancel")
+                                        }
                                     }
                                     )
                             }

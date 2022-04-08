@@ -32,9 +32,7 @@ class AccountViewModel @Inject constructor(
         viewModelScope.launch {
             accountRepository.getAllAccount().collectLatest {
                 if (it.isEmpty()){
-                    _accounts.value = Resource.Fail(arrayListOf(
-                        Account(0, R.drawable.ic_baseline_web_24,"enk23r","123345","web","webside")
-                    ),"No Data")
+                    _accounts.value = Resource.Fail(arrayListOf(),"No Data")
                 }else{
                     _accounts.value = Resource.Success(it)
                 }
@@ -49,10 +47,8 @@ class AccountViewModel @Inject constructor(
     }
 
     fun deleteAccount(account: Account){
-        Log.d("TAG", "deleteAccount: $account ")
         viewModelScope.launch {
             accountRepository.delete(account)
-            getData()
         }
     }
 

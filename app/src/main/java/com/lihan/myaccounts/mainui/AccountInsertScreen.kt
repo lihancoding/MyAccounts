@@ -15,6 +15,8 @@ import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.layoutId
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -57,6 +59,9 @@ fun AccountInsertScreen(
         AccountType.CreditCard,
         AccountType.Phone
     )
+    var isShow = remember {
+        mutableStateOf(false)
+    }
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
@@ -77,7 +82,7 @@ fun AccountInsertScreen(
                         navController.popBackStack()
                     }
                 }) {
-                Icon(Icons.Filled.Done,"")
+                Icon(Icons.Filled.Done,"", tint = Color.White)
             }
         }
     ) {
@@ -86,32 +91,39 @@ fun AccountInsertScreen(
             verticalArrangement = Arrangement.Center,
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Image(
-                painter = painterResource(id = accountIcon), 
-                contentDescription = "",
-                modifier = Modifier.size(50.dp)
-                )
-            Spacer(modifier = Modifier.width(spacerWidth))
-            Box(
-                modifier = Modifier.fillMaxWidth(),
-                contentAlignment = Alignment.Center
-            ){
-               LazyRow{
-                   items(typelist){ type->
-                       Spacer(modifier = Modifier.width(4.dp))
-                       Image(
-                           painter = painterResource(id = type.type),
-                           contentDescription = type.toString(),
-                           modifier = Modifier
-                               .size(50.dp)
-                               .clickable {
-                                   accountIcon = type.type
-                               }
-                       )
-                   }
-               }
 
+                Box(
+                    modifier = Modifier.fillMaxWidth(),
+                    contentAlignment = Alignment.Center
+                ){
+                    if (isShow.value){
+                    LazyRow{
+                        items(typelist){ type->
+                            Spacer(modifier = Modifier.width(4.dp))
+                            Image(
+                                painter = painterResource(id = type.type),
+                                contentDescription = type.toString(),
+                                modifier = Modifier
+                                    .size(50.dp)
+                                    .padding(8.dp)
+                                    .clickable {
+                                        accountIcon = type.type
+                                    }
+                            )
+                        }
+                    }
+                }
             }
+            Spacer(modifier = Modifier.width(spacerWidth))
+            Image(
+                painter = painterResource(id = accountIcon),
+                contentDescription = "",
+                modifier = Modifier
+                    .size(50.dp)
+                    .clickable {
+                        isShow.value = !isShow.value
+                    }
+            )
 
             Spacer(modifier = Modifier.width(spacerWidth))
             OutlinedTextField(
