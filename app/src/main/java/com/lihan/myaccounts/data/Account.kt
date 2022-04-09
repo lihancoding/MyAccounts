@@ -1,8 +1,10 @@
 package com.lihan.myaccounts.data
 
+import android.net.Uri
 import android.os.Parcel
 import android.os.Parcelable
-
+import androidx.versionedparcelable.ParcelField
+import com.google.gson.Gson
 
 data class Account (
     val id : Int?=null,
@@ -43,5 +45,9 @@ data class Account (
         override fun newArray(size: Int): Array<Account?> {
             return arrayOfNulls(size)
         }
+    }
+
+    fun toJsonString(): String {
+        return Uri.encode(Gson().toJson(this))
     }
 }

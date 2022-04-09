@@ -1,7 +1,5 @@
 package com.lihan.myaccounts.mainui
 
-import android.util.Log
-import android.widget.Toast
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -25,22 +23,14 @@ import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavHostController
-import androidx.navigation.navArgument
+import com.google.gson.Gson
 import com.lihan.myaccounts.data.Account
-import com.lihan.myaccounts.data.AccountType
 import com.wajahatkarim.flippable.Flippable
 import com.wajahatkarim.flippable.rememberFlipController
-import com.lihan.myaccounts.R
 import com.lihan.myaccounts.Resource
 import com.lihan.myaccounts.Screen
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.launch
-import java.util.*
-import kotlin.collections.ArrayList
 
 @Composable
 fun AccountListScreen(
@@ -83,9 +73,7 @@ fun AccountListScreen(
         ) {
             LazyColumn{
                 items(data){ account->
-                    AccountItem(account = account, toUpdate = {
-                        navController.navigate("${Screen.AccountUpdateScreen.route}/${account}")
-                    })
+                    AccountItem(account = account,navController)
                 }
             }
 
@@ -96,14 +84,20 @@ fun AccountListScreen(
 }
 @Composable
 fun AccountItem(
-    account : Account,
-    toUpdate:() ->Unit ,
-    viewModel: AccountViewModel = hiltViewModel())
+    account: Account,
+    navController: NavHostController,
+    viewModel: AccountViewModel = hiltViewModel()
+
+)
 {
     val showDeleteAlert = remember {
         mutableStateOf(false)
     }
 
+    fun navigationToUpdateAccount(account: Account) {
+        val accountJson = Gson().toJson(account)
+        navController.navigate(Screen.AccountUpdateScreen.route+"/${accountJson}")
+    }
 
         Column(
             modifier = Modifier
@@ -213,7 +207,7 @@ fun AccountItem(
                                 modifier = Modifier
                                     .weight(1f)
                                     .clickable {
-                                        toUpdate()
+                                        navigationToUpdateAccount(account)
                                     },
                                 imageVector = Icons.Filled.Edit, contentDescription = "Edit")
                         }

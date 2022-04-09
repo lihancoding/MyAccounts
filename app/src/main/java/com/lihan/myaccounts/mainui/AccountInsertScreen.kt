@@ -108,6 +108,7 @@ fun AccountInsertScreen(
                                     .padding(8.dp)
                                     .clickable {
                                         accountIcon = type.type
+                                        isShow.value = false
                                     }
                             )
                         }

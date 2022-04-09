@@ -1,5 +1,6 @@
 package com.lihan.myaccounts.mainui
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -18,6 +19,7 @@ import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
+import com.google.gson.Gson
 import com.lihan.myaccounts.R
 import com.lihan.myaccounts.data.Account
 import com.lihan.myaccounts.data.AccountType
@@ -26,7 +28,7 @@ import kotlinx.coroutines.launch
 
 @Composable
 fun AccountUpdateScreen(
-    account : Account,
+    account: Account,
     navController: NavController,
     viewModel:AccountViewModel = hiltViewModel()
     ) {
@@ -102,6 +104,7 @@ fun AccountUpdateScreen(
                                     .padding(8.dp)
                                     .clickable {
                                         accountIcon = type.type
+                                        isShow.value = false
                                     }
                             )
                         }
