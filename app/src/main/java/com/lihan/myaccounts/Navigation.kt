@@ -21,7 +21,7 @@ fun Navigation(mainActivity: MainActivity) {
         composable(route = Screen.LoginScreen.route){
             LoginScreen(navController,mainActivity)
         }
-        composable(route = Screen.AccountScreen.route){
+        composable(route = Screen.AccountListScreen.route){
             AccountListScreen(navController)
         }
 

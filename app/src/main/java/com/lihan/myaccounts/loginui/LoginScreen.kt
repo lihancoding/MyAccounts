@@ -7,17 +7,22 @@ import androidx.biometric.BiometricPrompt
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
+import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.lihan.myaccounts.MainActivity
-import com.lihan.myaccounts.PINCODE_KEY
-import com.lihan.myaccounts.SHAREDPREFERENCES_KEY
-import com.lihan.myaccounts.Screen
+import com.lihan.myaccounts.*
+import com.lihan.myaccounts.R
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.launch
 import java.util.concurrent.Executors
 
 @Composable
@@ -28,7 +33,7 @@ fun LoginScreen(navController: NavHostController, mainActivity: MainActivity) {
     val withFingerLogin = BiometricManager.from(mainActivity)
         .canAuthenticate() == BiometricManager.BIOMETRIC_SUCCESS
 
-    if (!withFingerLogin){
+//    if (!withFingerLogin){
         val sp = mainActivity.getSharedPreferences(SHAREDPREFERENCES_KEY, Context.MODE_PRIVATE)
         val mPinCode = sp.getString(PINCODE_KEY,"")
         mPinCode?.let {
@@ -38,9 +43,10 @@ fun LoginScreen(navController: NavHostController, mainActivity: MainActivity) {
                 pinCodeLogin(navController)
             }
         }
-    }else{
-        fingerLogin(mainActivity,navController)
-    }
+//    }
+//    else{
+//        fingerLogin(mainActivity,navController)
+//    }
 
 
 }
@@ -94,7 +100,7 @@ fun CreatePinCode(navController: NavHostController) {
                     if (textFieldValue == textFieldValueAgain){
                         val sp = context.getSharedPreferences(SHAREDPREFERENCES_KEY, Context.MODE_PRIVATE)
                         sp.edit().putString(PINCODE_KEY,textFieldValue).commit()
-                        navController.navigate(Screen.AccountScreen.route)
+                        navController.navigate(Screen.AccountListScreen.route)
                     }
                 },
                 modifier = Modifier
@@ -112,9 +118,19 @@ fun CreatePinCode(navController: NavHostController) {
 @Composable
 fun pinCodeLogin(navController: NavHostController) {
     val context = LocalContext.current
-
+    val sp = context.getSharedPreferences(SHAREDPREFERENCES_KEY,Context.MODE_PRIVATE)
     var textFieldValue by remember {
-        mutableStateOf("")
+        mutableStateOf(sp.getString(PINCODE_KEY,""))
+    }
+
+    var passwordCanSee by remember {
+        mutableStateOf(false)
+    }
+    val icon = if (passwordCanSee){
+        painterResource(id = R.drawable.ic_baseline_visibility_24)
+    }else{
+        painterResource(id = R.drawable.ic_baseline_visibility_off_24)
+
     }
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -122,35 +138,47 @@ fun pinCodeLogin(navController: NavHostController) {
     horizontalAlignment = Alignment.CenterHorizontally
 
     ) {
-        Column {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
             OutlinedTextField(
                 label = { Text(text = "PinCode")},
-                value = textFieldValue,
+                value = textFieldValue!!,
                 onValueChange = {
                     if (it.length <= 4){
                         textFieldValue = it
                     }
                 },
-                modifier = Modifier.padding(16.dp),
+                modifier = Modifier.padding(10.dp),
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword),
                 maxLines = 1,
-                singleLine = true
+                singleLine = true,
+                trailingIcon = {
+                    IconButton(onClick = {
+                        passwordCanSee = !passwordCanSee
+                    }) {
+                        Icon(painter = icon, contentDescription = "show or no show")
+                    }
+
+                },
+                visualTransformation = if (passwordCanSee) VisualTransformation.None else PasswordVisualTransformation()
 
             )
-            Button(
-                onClick = {
-                    val sp = context.getSharedPreferences(SHAREDPREFERENCES_KEY,Context.MODE_PRIVATE)
-                    val pincode = sp.getString(PINCODE_KEY,"")
-                    if (pincode == textFieldValue){
-                        navController.navigate(Screen.AccountScreen.route)
-                    }
-                },
-                modifier = Modifier
-                    .align(Alignment.End)
-                    .padding(end = 16.dp)
-            ) {
-                Text(text = "Login")
-            }
+           Button(
+                    onClick = {
+                        val sp = context.getSharedPreferences(SHAREDPREFERENCES_KEY,Context.MODE_PRIVATE)
+                        val pincode = sp.getString(PINCODE_KEY,"")
+                        if (pincode == textFieldValue){
+                            navController.navigate(Screen.AccountListScreen.route)
+                        }
+                    },
+                    modifier = Modifier
+                        .align(Alignment.End)
+                        .padding(end = 16.dp)
+                ) {
+                    Text(text = "Login")
+                }
+
         }
 
 
@@ -178,7 +206,10 @@ private fun fingerLogin(mainActivity: MainActivity, navController: NavHostContro
                 executor,
                 object : BiometricPrompt.AuthenticationCallback() {
                     override fun onAuthenticationSucceeded(result: BiometricPrompt.AuthenticationResult) {
-                        navController.navigate(Screen.AccountScreen.route)
+                        CoroutineScope(Dispatchers.Main).launch {
+                            navController.navigate(Screen.AccountListScreen.route)
+                        }
+
                     }
 
                     override fun onAuthenticationError(
@@ -205,9 +236,3 @@ private fun fingerLogin(mainActivity: MainActivity, navController: NavHostContro
         else -> throw IllegalStateException("ここには入らないはず。")
     }
 }
-
-
-fun isHavePinCode(): Boolean {
-    return false
-}
-
