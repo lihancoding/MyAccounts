@@ -69,15 +69,16 @@ fun AccountInsertScreen(
                 modifier = Modifier.padding(16.dp),
                 onClick = {
                     scope.launch {
+                        val account = Account(
+                            icon = accountIcon,
+                            account = textAccount,
+                            password = textPassword,
+                            description =  textDescription,
+                            type = accountIcon.toString()
+                        )
+
                         viewModel.insertAccount(
-                            Account(
-                                id = 0,
-                                icon = accountIcon,
-                                account = textAccount,
-                                password = textPassword,
-                                description =  textDescription,
-                                type = accountIcon.toString()
-                            )
+                            account
                         )
                         navController.popBackStack()
                     }
@@ -140,9 +141,8 @@ fun AccountInsertScreen(
                 value = textPassword,
                 onValueChange ={
                         textPassword = it
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
-                )
+                }
+            )
             Spacer(modifier = Modifier.width(spacerWidth))
             OutlinedTextField(
                 label = { Text(text = "Description")},

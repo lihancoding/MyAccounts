@@ -136,8 +136,7 @@ fun AccountUpdateScreen(
                 value = textPassword,
                 onValueChange ={
                     textPassword = it
-                },
-                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.NumberPassword)
+                }
             )
             Spacer(modifier = Modifier.width(spacerWidth))
             OutlinedTextField(

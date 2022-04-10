@@ -1,5 +1,6 @@
 package com.lihan.myaccounts.mainui
 
+import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -37,7 +38,6 @@ fun AccountListScreen(
     navController: NavHostController,
     viewModel: AccountViewModel = hiltViewModel()
 ) {
-    val context = LocalContext.current
     var data by remember {
         mutableStateOf(listOf<Account>())
     }
@@ -46,7 +46,10 @@ fun AccountListScreen(
         viewModel.accounts.collect {
             when(it){
                 is Resource.Loading->{}
-                is Resource.Success->{ data = it.data }
+                is Resource.Success->{
+                    data = it.data
+                    Log.d("TAG", "AccountListScreen: ${it.toString()}")
+                }
                 is Resource.Fail->{ data = it.data }
             }
         }
@@ -72,7 +75,12 @@ fun AccountListScreen(
             Modifier.fillMaxSize()
         ) {
             LazyColumn{
-                items(data){ account->
+                items(
+                    items = data,
+                    key = { account ->
+                        account.id!!
+                    }
+                ){ account->
                     AccountItem(account = account,navController)
                 }
             }
@@ -87,7 +95,6 @@ fun AccountItem(
     account: Account,
     navController: NavHostController,
     viewModel: AccountViewModel = hiltViewModel()
-
 )
 {
     val showDeleteAlert = remember {
@@ -123,7 +130,8 @@ fun AccountItem(
                             Image(
                                 modifier = Modifier
                                     .padding(10.dp)
-                                    .size(55.dp),
+                                    .size(55.dp)
+                                    .clickable(enabled = false, onClick = {return@clickable}),
                                 painter = painterResource(id = account.icon),
                                 contentDescription = account.description,
                                 contentScale = ContentScale.Inside
