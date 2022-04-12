@@ -33,18 +33,11 @@ fun AccountUpdateScreen(
     viewModel:AccountViewModel = hiltViewModel()
     ) {
 
-    var textAccount by remember {
-        mutableStateOf(account.account)
-    }
-    var textPassword by remember {
-        mutableStateOf(account.password)
-    }
-    var textDescription by remember {
-        mutableStateOf(account.description)
-    }
-    var accountIcon by remember {
-        mutableStateOf(account.icon)
-    }
+    val textAccount = viewModel.accountString.collectAsState().value
+    val textPassword = viewModel.passwordString.collectAsState().value
+    val textDescription =viewModel.descriptionString.collectAsState().value
+    val accountIcon = viewModel.iconInt.collectAsState().value
+
     val spacerWidth = 16.dp
     val scope = rememberCoroutineScope()
     val typelist = listOf(
@@ -55,7 +48,7 @@ fun AccountUpdateScreen(
         AccountType.CreditCard,
         AccountType.Phone
     )
-    var isShow = remember {
+    val isShow = remember {
         mutableStateOf(false)
     }
     Scaffold(
@@ -103,7 +96,7 @@ fun AccountUpdateScreen(
                                     .size(50.dp)
                                     .padding(8.dp)
                                     .clickable {
-                                        accountIcon = type.type
+                                        viewModel.setIconInt(type.type)
                                         isShow.value = false
                                     }
                             )
@@ -127,7 +120,7 @@ fun AccountUpdateScreen(
                 label = { Text(text = "Account") },
                 value = textAccount,
                 onValueChange ={
-                    textAccount = it
+                    viewModel.setAccountString(it)
                 }
             )
             Spacer(modifier = Modifier.width(spacerWidth))
@@ -135,7 +128,7 @@ fun AccountUpdateScreen(
                 label = { Text(text = "Password") },
                 value = textPassword,
                 onValueChange ={
-                    textPassword = it
+                    viewModel.setPasswordString(it)
                 }
             )
             Spacer(modifier = Modifier.width(spacerWidth))
@@ -143,7 +136,7 @@ fun AccountUpdateScreen(
                 label = { Text(text = "Description") },
                 value = textDescription,
                 onValueChange ={
-                    textDescription = it
+                    viewModel.setDescriptionString(it)
                 })
 
 

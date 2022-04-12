@@ -19,6 +19,17 @@ class AccountViewModel @Inject constructor(
     private val accountRepository: AccountRepository
 ) : ViewModel() {
 
+    private val _accountString = MutableStateFlow("")
+    val accountString = _accountString
+
+    private val _passwordString = MutableStateFlow("")
+    val passwordString = _passwordString
+
+    private val _descriptionString = MutableStateFlow("")
+    val descriptionString = _descriptionString
+
+    private val _iconInt = MutableStateFlow(R.drawable.ic_baseline_bank_24)
+    val iconInt = _iconInt
 
     private val _accounts = MutableStateFlow<Resource>(Resource.Loading)
     val accounts = _accounts
@@ -50,6 +61,21 @@ class AccountViewModel @Inject constructor(
         viewModelScope.launch {
             accountRepository.delete(account)
         }
+    }
+
+
+    fun setAccountString(string : String){
+        _accountString.value = string
+    }
+
+    fun setPasswordString(string : String){
+        _passwordString.value = string
+    }
+    fun setDescriptionString(string : String){
+        _descriptionString.value = string
+    }
+    fun setIconInt(intResource : Int){
+        _iconInt.value = intResource
     }
 
 

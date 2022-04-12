@@ -29,6 +29,8 @@ import com.lihan.myaccounts.Screen
 import com.lihan.myaccounts.data.Account
 import com.lihan.myaccounts.data.AccountType
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.flow.collect
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @Composable
@@ -37,18 +39,11 @@ fun AccountInsertScreen(
     viewModel: AccountViewModel = hiltViewModel()
 ) {
 
-    var textAccount by remember {
-        mutableStateOf("")
-    }
-    var textPassword by remember {
-        mutableStateOf("")
-    }
-    var textDescription by remember {
-        mutableStateOf("")
-    }
-    var accountIcon by remember {
-        mutableStateOf(R.drawable.ic_baseline_bank_24)
-    }
+    val textAccount = viewModel.accountString.collectAsState().value
+    val textPassword = viewModel.passwordString.collectAsState().value
+    val textDescription =viewModel.descriptionString.collectAsState().value
+    val accountIcon = viewModel.iconInt.collectAsState().value
+
     val spacerWidth = 16.dp
     val scope = rememberCoroutineScope()
     val typelist = listOf(
@@ -108,7 +103,7 @@ fun AccountInsertScreen(
                                     .size(50.dp)
                                     .padding(8.dp)
                                     .clickable {
-                                        accountIcon = type.type
+                                        viewModel.setIconInt(type.type)
                                         isShow.value = false
                                     }
                             )
@@ -132,7 +127,7 @@ fun AccountInsertScreen(
                 label = { Text(text = "Account")},
                 value = textAccount,
                 onValueChange ={
-                    textAccount = it
+                    viewModel.setAccountString(it)
                 }
             )
             Spacer(modifier = Modifier.width(spacerWidth))
@@ -140,7 +135,7 @@ fun AccountInsertScreen(
                 label = { Text(text = "Password")},
                 value = textPassword,
                 onValueChange ={
-                        textPassword = it
+                    viewModel.setPasswordString(it)
                 }
             )
             Spacer(modifier = Modifier.width(spacerWidth))
@@ -148,7 +143,7 @@ fun AccountInsertScreen(
                 label = { Text(text = "Description")},
                 value = textDescription,
                 onValueChange ={
-                    textDescription = it
+                    viewModel.setDescriptionString(it)
                 })
 
 

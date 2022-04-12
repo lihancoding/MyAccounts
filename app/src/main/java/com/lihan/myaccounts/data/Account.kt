@@ -46,8 +46,4 @@ data class Account (
             return arrayOfNulls(size)
         }
     }
-
-    fun toJsonString(): String {
-        return Uri.encode(Gson().toJson(this))
-    }
 }
