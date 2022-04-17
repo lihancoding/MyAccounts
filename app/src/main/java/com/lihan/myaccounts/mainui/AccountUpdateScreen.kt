@@ -22,6 +22,7 @@ import androidx.navigation.NavController
 import com.google.gson.Gson
 import com.lihan.myaccounts.R
 import com.lihan.myaccounts.data.Account
+import com.lihan.myaccounts.data.AccountInsertEvent
 import com.lihan.myaccounts.data.AccountType
 import kotlinx.coroutines.launch
 
@@ -32,11 +33,6 @@ fun AccountUpdateScreen(
     navController: NavController,
     viewModel:AccountViewModel = hiltViewModel()
     ) {
-
-    val textAccount = viewModel.accountString.collectAsState().value
-    val textPassword = viewModel.passwordString.collectAsState().value
-    val textDescription =viewModel.descriptionString.collectAsState().value
-    val accountIcon = viewModel.iconInt.collectAsState().value
 
     val spacerWidth = 16.dp
     val scope = rememberCoroutineScope()
@@ -51,6 +47,7 @@ fun AccountUpdateScreen(
     val isShow = remember {
         mutableStateOf(false)
     }
+    viewModel.accountInsertState = account
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
@@ -58,16 +55,7 @@ fun AccountUpdateScreen(
                 modifier = Modifier.padding(16.dp),
                 onClick = {
                     scope.launch {
-                        viewModel.insertAccount(
-                            Account(
-                                id = account.id,
-                                icon = accountIcon,
-                                account = textAccount,
-                                password = textPassword,
-                                description =  textDescription,
-                                type = accountIcon.toString()
-                            )
-                        )
+                        viewModel.insertAccount()
                         navController.popBackStack()
                     }
                 }) {
@@ -96,7 +84,7 @@ fun AccountUpdateScreen(
                                     .size(50.dp)
                                     .padding(8.dp)
                                     .clickable {
-                                        viewModel.setIconInt(type.type)
+                                        viewModel.inputEvent(AccountInsertEvent.Icon(type.type))
                                         isShow.value = false
                                     }
                             )
@@ -106,7 +94,7 @@ fun AccountUpdateScreen(
             }
             Spacer(modifier = Modifier.width(spacerWidth))
             Image(
-                painter = painterResource(id = accountIcon),
+                painter = painterResource(id = viewModel.accountInsertState.icon),
                 contentDescription = "",
                 modifier = Modifier
                     .size(50.dp)
@@ -118,25 +106,25 @@ fun AccountUpdateScreen(
             Spacer(modifier = Modifier.width(spacerWidth))
             OutlinedTextField(
                 label = { Text(text = "Account") },
-                value = textAccount,
+                value = viewModel.accountInsertState.account,
                 onValueChange ={
-                    viewModel.setAccountString(it)
+                    viewModel.inputEvent(AccountInsertEvent.Account(it))
                 }
             )
             Spacer(modifier = Modifier.width(spacerWidth))
             OutlinedTextField(
                 label = { Text(text = "Password") },
-                value = textPassword,
+                value = viewModel.accountInsertState.password,
                 onValueChange ={
-                    viewModel.setPasswordString(it)
+                    viewModel.inputEvent(AccountInsertEvent.Password(it))
                 }
             )
             Spacer(modifier = Modifier.width(spacerWidth))
             OutlinedTextField(
                 label = { Text(text = "Description") },
-                value = textDescription,
+                value = viewModel.accountInsertState.description,
                 onValueChange ={
-                    viewModel.setDescriptionString(it)
+                    viewModel.inputEvent(AccountInsertEvent.Description(it))
                 })
 
 

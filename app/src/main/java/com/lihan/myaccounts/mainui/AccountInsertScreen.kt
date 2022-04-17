@@ -5,32 +5,19 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.text.KeyboardActionScope
-import androidx.compose.foundation.text.KeyboardActions
-import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.Done
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.layoutId
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.input.KeyboardType
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
-import com.lihan.myaccounts.R
-import com.lihan.myaccounts.Screen
-import com.lihan.myaccounts.data.Account
+import com.lihan.myaccounts.data.AccountInsertEvent
 import com.lihan.myaccounts.data.AccountType
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.flow.collect
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 
 @Composable
@@ -38,11 +25,6 @@ fun AccountInsertScreen(
     navController: NavController,
     viewModel: AccountViewModel = hiltViewModel()
 ) {
-
-    val textAccount = viewModel.accountString.collectAsState().value
-    val textPassword = viewModel.passwordString.collectAsState().value
-    val textDescription =viewModel.descriptionString.collectAsState().value
-    val accountIcon = viewModel.iconInt.collectAsState().value
 
     val spacerWidth = 16.dp
     val scope = rememberCoroutineScope()
@@ -57,6 +39,8 @@ fun AccountInsertScreen(
     var isShow = remember {
         mutableStateOf(false)
     }
+
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         floatingActionButton = {
@@ -64,17 +48,7 @@ fun AccountInsertScreen(
                 modifier = Modifier.padding(16.dp),
                 onClick = {
                     scope.launch {
-                        val account = Account(
-                            icon = accountIcon,
-                            account = textAccount,
-                            password = textPassword,
-                            description =  textDescription,
-                            type = accountIcon.toString()
-                        )
-
-                        viewModel.insertAccount(
-                            account
-                        )
+                        viewModel.insertAccount()
                         navController.popBackStack()
                     }
                 }) {
@@ -103,7 +77,7 @@ fun AccountInsertScreen(
                                     .size(50.dp)
                                     .padding(8.dp)
                                     .clickable {
-                                        viewModel.setIconInt(type.type)
+                                        viewModel.inputEvent(AccountInsertEvent.Icon(type.type))
                                         isShow.value = false
                                     }
                             )
@@ -113,7 +87,7 @@ fun AccountInsertScreen(
             }
             Spacer(modifier = Modifier.width(spacerWidth))
             Image(
-                painter = painterResource(id = accountIcon),
+                painter = painterResource(id = viewModel.accountInsertState.icon),
                 contentDescription = "",
                 modifier = Modifier
                     .size(50.dp)
@@ -125,25 +99,26 @@ fun AccountInsertScreen(
             Spacer(modifier = Modifier.width(spacerWidth))
             OutlinedTextField(
                 label = { Text(text = "Account")},
-                value = textAccount,
+                value = viewModel.accountInsertState.account,
                 onValueChange ={
-                    viewModel.setAccountString(it)
+                    viewModel.inputEvent(AccountInsertEvent.Account(it))
                 }
             )
             Spacer(modifier = Modifier.width(spacerWidth))
             OutlinedTextField(
                 label = { Text(text = "Password")},
-                value = textPassword,
+                value = viewModel.accountInsertState.password,
                 onValueChange ={
-                    viewModel.setPasswordString(it)
+                    viewModel.inputEvent(AccountInsertEvent.Password(it))
+
                 }
             )
             Spacer(modifier = Modifier.width(spacerWidth))
             OutlinedTextField(
                 label = { Text(text = "Description")},
-                value = textDescription,
+                value = viewModel.accountInsertState.description,
                 onValueChange ={
-                    viewModel.setDescriptionString(it)
+                   viewModel.inputEvent(AccountInsertEvent.Description(it))
                 })
 
 

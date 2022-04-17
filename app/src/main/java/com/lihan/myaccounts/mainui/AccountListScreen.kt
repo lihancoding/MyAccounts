@@ -38,24 +38,6 @@ fun AccountListScreen(
     navController: NavHostController,
     viewModel: AccountViewModel = hiltViewModel()
 ) {
-    var data by remember {
-        mutableStateOf(listOf<Account>())
-    }
-
-    LaunchedEffect("",block = {
-        viewModel.accounts.collect {
-            when(it){
-                is Resource.Loading->{}
-                is Resource.Success->{
-                    data = it.data
-                    Log.d("TAG", "AccountListScreen: ${it.toString()}")
-                }
-                is Resource.Fail->{ data = it.data }
-            }
-        }
-    })
-
-
     Scaffold(
         modifier = Modifier
             .background(Color.White)
@@ -76,7 +58,7 @@ fun AccountListScreen(
         ) {
             LazyColumn{
                 items(
-                    items = data,
+                    items = viewModel.accountState.accountList,
                     key = { account ->
                         account.id!!
                     }

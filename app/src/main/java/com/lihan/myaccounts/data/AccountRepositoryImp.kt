@@ -12,7 +12,6 @@ class AccountRepositoryImp (
     }
 
     override suspend fun delete(account: Account){
-        Log.d("TAG", "delete:  lmp ")
         dao.delete(account.toAccountEntity())
     }
 

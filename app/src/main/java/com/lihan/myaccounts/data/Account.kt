@@ -5,6 +5,7 @@ import android.os.Parcel
 import android.os.Parcelable
 import androidx.versionedparcelable.ParcelField
 import com.google.gson.Gson
+import com.lihan.myaccounts.R
 
 data class Account (
     val id : Int?=null,
@@ -14,6 +15,8 @@ data class Account (
     var description : String,
     var type : String
 ) : Parcelable {
+    constructor():this(null, R.drawable.ic_baseline_web_24,"","","","")
+
     constructor(parcel: Parcel) : this(
         parcel.readValue(Int::class.java.classLoader) as? Int,
         parcel.readInt(),

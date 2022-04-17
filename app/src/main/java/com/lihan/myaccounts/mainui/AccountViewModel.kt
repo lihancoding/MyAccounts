@@ -1,59 +1,43 @@
 package com.lihan.myaccounts.mainui
 
-import android.util.Log
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.lihan.myaccounts.R
-import com.lihan.myaccounts.Resource
 import com.lihan.myaccounts.data.Account
+import com.lihan.myaccounts.data.AccountInsertEvent
 import com.lihan.myaccounts.data.AccountRepository
-import com.lihan.myaccounts.data.AccountRepositoryImp
+import com.lihan.myaccounts.data.AccountState
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+
 
 @HiltViewModel
 class AccountViewModel @Inject constructor(
     private val accountRepository: AccountRepository
 ) : ViewModel() {
 
-    private val _accountString = MutableStateFlow("")
-    val accountString = _accountString
-
-    private val _passwordString = MutableStateFlow("")
-    val passwordString = _passwordString
-
-    private val _descriptionString = MutableStateFlow("")
-    val descriptionString = _descriptionString
-
-    private val _iconInt = MutableStateFlow(R.drawable.ic_baseline_bank_24)
-    val iconInt = _iconInt
-
-    private val _accounts = MutableStateFlow<Resource>(Resource.Loading)
-    val accounts = _accounts
+    var accountInsertState by mutableStateOf(Account())
+    var accountState by mutableStateOf(AccountState())
 
     init {
         getData()
     }
 
     private fun getData() {
-        _accounts.value = Resource.Loading
         viewModelScope.launch {
             accountRepository.getAllAccount().collectLatest {
-                if (it.isEmpty()){
-                    _accounts.value = Resource.Fail(arrayListOf(),"No Data")
-                }else{
-                    _accounts.value = Resource.Success(it)
-                }
+                    accountState = accountState.copy(accountList = it)
             }
         }
     }
-
-    fun insertAccount(account : Account){
+    fun insertAccount(){
         viewModelScope.launch {
-            accountRepository.insert(account)
+            accountRepository.insert(accountInsertState)
         }
     }
 
@@ -63,26 +47,22 @@ class AccountViewModel @Inject constructor(
         }
     }
 
-
-    fun setAccountString(string : String){
-        _accountString.value = string
+    fun inputEvent(accountInsertEvent: AccountInsertEvent){
+       when(accountInsertEvent){
+           is AccountInsertEvent.Account ->{
+               accountInsertState = accountInsertState.copy(account = accountInsertEvent.account)
+           }
+           is AccountInsertEvent.Password->{
+               accountInsertState = accountInsertState.copy(password = accountInsertEvent.password)
+           }
+           is AccountInsertEvent.Description->{
+               accountInsertState = accountInsertState.copy(description = accountInsertEvent.description)
+           }
+           is AccountInsertEvent.Icon->{
+               accountInsertState = accountInsertState.copy(icon = accountInsertEvent.icon)
+           }
+       }
     }
-
-    fun setPasswordString(string : String){
-        _passwordString.value = string
-    }
-    fun setDescriptionString(string : String){
-        _descriptionString.value = string
-    }
-    fun setIconInt(intResource : Int){
-        _iconInt.value = intResource
-    }
-
-
-
-
-
-
 
 
 }
