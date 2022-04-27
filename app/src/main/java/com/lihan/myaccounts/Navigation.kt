@@ -8,19 +8,15 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.google.gson.Gson
 import com.lihan.myaccounts.data.Account
-import com.lihan.myaccounts.loginui.LoginScreen
 import com.lihan.myaccounts.mainui.AccountInsertScreen
 import com.lihan.myaccounts.mainui.AccountListScreen
 import com.lihan.myaccounts.mainui.AccountUpdateScreen
 
 @Composable
-fun Navigation(mainActivity: MainActivity) {
+fun Navigation() {
     val navController = rememberNavController()
 
-    NavHost(navController = navController, startDestination = Screen.LoginScreen.route ){
-        composable(route = Screen.LoginScreen.route){
-            LoginScreen(navController,mainActivity)
-        }
+    NavHost(navController = navController, startDestination = Screen.AccountListScreen.route ){
         composable(route = Screen.AccountListScreen.route){
             AccountListScreen(navController)
         }

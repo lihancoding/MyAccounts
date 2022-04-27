@@ -20,6 +20,7 @@
         <entry key="app/src/main/res/drawable/ic_baseline_phone_android_24.xml" value="0.1835" />
         <entry key="app/src/main/res/drawable/ic_baseline_watch_24.xml" value="0.1835" />
         <entry key="app/src/main/res/drawable/ic_baseline_web_24.xml" value="0.1835" />
+        <entry key="app/src/main/res/layout/activity_login.xml" value="0.10052083333333334" />
       </map>
     </option>
   </component>
