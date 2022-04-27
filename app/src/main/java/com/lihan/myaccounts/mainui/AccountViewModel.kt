@@ -5,7 +5,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.lihan.myaccounts.R
 import com.lihan.myaccounts.data.Account
 import com.lihan.myaccounts.data.AccountInsertEvent
 import com.lihan.myaccounts.data.AccountRepository
@@ -22,7 +21,7 @@ class AccountViewModel @Inject constructor(
 ) : ViewModel() {
 
     var accountInsertState by mutableStateOf(Account())
-    var accountState by mutableStateOf(AccountState())
+    var accountListState by mutableStateOf(AccountState())
 
     init {
         getData()
@@ -31,7 +30,7 @@ class AccountViewModel @Inject constructor(
     private fun getData() {
         viewModelScope.launch {
             accountRepository.getAllAccount().collectLatest {
-                    accountState = accountState.copy(accountList = it)
+                    accountListState = accountListState.copy(accountList = it)
             }
         }
     }
@@ -48,20 +47,20 @@ class AccountViewModel @Inject constructor(
     }
 
     fun inputEvent(accountInsertEvent: AccountInsertEvent){
-       when(accountInsertEvent){
-           is AccountInsertEvent.Account ->{
-               accountInsertState = accountInsertState.copy(account = accountInsertEvent.account)
-           }
-           is AccountInsertEvent.Password->{
-               accountInsertState = accountInsertState.copy(password = accountInsertEvent.password)
-           }
-           is AccountInsertEvent.Description->{
-               accountInsertState = accountInsertState.copy(description = accountInsertEvent.description)
-           }
-           is AccountInsertEvent.Icon->{
-               accountInsertState = accountInsertState.copy(icon = accountInsertEvent.icon)
-           }
-       }
+        accountInsertState = when(accountInsertEvent){
+            is AccountInsertEvent.Account ->{
+                accountInsertState.copy(account = accountInsertEvent.account)
+            }
+            is AccountInsertEvent.Password->{
+                accountInsertState.copy(password = accountInsertEvent.password)
+            }
+            is AccountInsertEvent.Description->{
+                accountInsertState.copy(description = accountInsertEvent.description)
+            }
+            is AccountInsertEvent.Icon->{
+                accountInsertState.copy(icon = accountInsertEvent.icon)
+            }
+        }
     }
 
 

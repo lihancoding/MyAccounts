@@ -1,6 +1,5 @@
 package com.lihan.myaccounts.mainui
 
-import android.util.Log
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -18,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.unit.dp
@@ -29,9 +27,7 @@ import com.google.gson.Gson
 import com.lihan.myaccounts.data.Account
 import com.wajahatkarim.flippable.Flippable
 import com.wajahatkarim.flippable.rememberFlipController
-import com.lihan.myaccounts.Resource
 import com.lihan.myaccounts.Screen
-import kotlinx.coroutines.flow.collect
 
 @Composable
 fun AccountListScreen(
@@ -58,7 +54,7 @@ fun AccountListScreen(
         ) {
             LazyColumn{
                 items(
-                    items = viewModel.accountState.accountList,
+                    items = viewModel.accountListState.accountList,
                     key = { account ->
                         account.id!!
                     }
